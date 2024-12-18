@@ -49,6 +49,7 @@ export async function GET() {
         );
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return data.results.map((item: any) => ({
         id: item.id,
         imageUrl: item.poster_path
@@ -56,6 +57,7 @@ export async function GET() {
           : "/placeholder.svg?height=300&width=200", // Fallback placeholder
         title: item.title || item.name || "Untitled",
       }));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Fetch Error:", error.message);
       return [];

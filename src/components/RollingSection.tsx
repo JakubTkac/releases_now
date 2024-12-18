@@ -72,6 +72,8 @@ export function RollingSection() {
               imageUrl={poster.imageUrl}
               title={poster.title}
               isRolling
+              id={index}
+              type="movie"
             />
           </div>
         ))}

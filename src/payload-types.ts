@@ -31,7 +31,7 @@ export interface Config {
       | PayloadMigrationsSelect<false>
       | PayloadMigrationsSelect<true>;
   };
-  z;
+  z: any;
   db: {
     defaultIDType: number;
   };

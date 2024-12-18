@@ -2,13 +2,10 @@ import { NextResponse } from "next/server";
 
 const TMDB_API_BASE = "https://api.themoviedb.org/3";
 
-export async function GET(
-  request: Request,
-  { params }: { params: { id: string } },
-) {
-  const { id } = params;
-  const url = new URL(request.url);
-  const type = url.searchParams.get("type");
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id"); // Get `id` from the query parameters
+  const type = searchParams.get("type"); // Get `type` from the query parameters
 
   // Validate environment variables
   if (!process.env.TMDB_API_KEY) {
@@ -40,6 +37,7 @@ export async function GET(
 
     console.log("Fetched Details:", data); // Debug data
     return NextResponse.json(data, { status: 200 });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error("Error fetching details:", error.message);
     return NextResponse.json(

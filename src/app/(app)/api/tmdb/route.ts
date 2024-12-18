@@ -50,6 +50,7 @@ export async function GET(req: Request) {
       );
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const formattedData = data.results.map((item: any) => ({
       id: item.id,
       imageUrl: item.poster_path
@@ -59,6 +60,7 @@ export async function GET(req: Request) {
     }));
 
     return NextResponse.json(formattedData, { status: 200 });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     return NextResponse.json(
       { error: error.message || "Something went wrong" },
