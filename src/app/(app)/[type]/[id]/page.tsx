@@ -1,54 +1,18 @@
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { notFound } from "next/navigation";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
-import { PageProps } from "next";
 
-interface Genre {
-  id: number;
-  name: string;
-}
-
-interface Cast {
-  id: number;
-  name: string;
-  character: string;
-  profile_path: string | null;
-}
-
-interface Video {
+interface Params {
+  type: "movie" | "tv";
   id: string;
-  key: string;
-  name: string;
-  site: string;
 }
 
-interface Details {
-  title?: string;
-  name?: string;
-  overview?: string;
-  poster_path?: string;
-  backdrop_path?: string;
-  release_date?: string;
-  first_air_date?: string;
-  vote_average?: number;
-  genres?: Genre[];
-  status?: string;
-  number_of_seasons?: number;
-  number_of_episodes?: number;
-  next_episode_to_air?: {
-    name: string;
-    air_date: string;
-  };
-  credits?: {
-    cast?: Cast[];
-  };
-  videos?: {
-    results?: Video[];
-  };
-}
-
-export default async function DetailsPage({ params }: PageProps) {
-  const { type, id } = params as { type: "movie" | "tv"; id: string };
+export default async function DetailsPage(context: {
+  params: Promise<Params>;
+}) {
+  const params = await context.params; // Await the params to resolve the Promise
+  const { type, id } = params;
 
   // Validate the type
   if (type !== "movie" && type !== "tv") {
@@ -59,7 +23,7 @@ export default async function DetailsPage({ params }: PageProps) {
 
   try {
     const apiUrl = `${baseUrl}/api/tmdb/details/${id}?type=${type}`;
-    console.log("Fetching details from:", apiUrl);
+    console.log("Fetching details from:", apiUrl); // Debug URL
 
     const res = await fetch(apiUrl, { cache: "no-store" });
 
@@ -68,7 +32,7 @@ export default async function DetailsPage({ params }: PageProps) {
       notFound();
     }
 
-    const data: Details = await res.json();
+    const data = await res.json();
     console.log("Fetched Full Details:", data);
 
     return (
@@ -100,11 +64,12 @@ export default async function DetailsPage({ params }: PageProps) {
                 {data.release_date || data.first_air_date || "N/A"}
               </p>
               <p>
-                <strong>Rating:</strong> {data.vote_average ?? "N/A"} / 10
+                <strong>Rating:</strong> {data.vote_average} / 10
               </p>
               <p>
                 <strong>Genres:</strong>{" "}
-                {data.genres?.map((genre) => genre.name).join(", ") || "N/A"}
+                {data.genres?.map((genre: any) => genre.name).join(", ") ||
+                  "N/A"}
               </p>
               <p>
                 <strong>Status:</strong> {data.status || "N/A"}
@@ -115,12 +80,10 @@ export default async function DetailsPage({ params }: PageProps) {
             {type === "tv" && (
               <div className="mt-4 space-y-2">
                 <p>
-                  <strong>Number of Seasons:</strong>{" "}
-                  {data.number_of_seasons ?? "N/A"}
+                  <strong>Number of Seasons:</strong> {data.number_of_seasons}
                 </p>
                 <p>
-                  <strong>Number of Episodes:</strong>{" "}
-                  {data.number_of_episodes ?? "N/A"}
+                  <strong>Number of Episodes:</strong> {data.number_of_episodes}
                 </p>
                 {data.next_episode_to_air && (
                   <p>
@@ -135,11 +98,11 @@ export default async function DetailsPage({ params }: PageProps) {
         </div>
 
         {/* Cast Section */}
-        {data.credits?.cast?.length ? (
+        {data.credits?.cast?.length > 0 && (
           <div className="mt-8">
             <h2 className="text-2xl font-bold mb-4 text-primary">Cast</h2>
             <div className="flex overflow-x-auto gap-4 hide-scrollbar">
-              {data.credits.cast.slice(0, 10).map((actor) => (
+              {data.credits.cast.slice(0, 10).map((actor: any) => (
                 <div key={actor.id} className="w-32 text-center">
                   <img
                     src={
@@ -156,17 +119,17 @@ export default async function DetailsPage({ params }: PageProps) {
               ))}
             </div>
           </div>
-        ) : null}
+        )}
 
         {/* Videos Section */}
-        {data.videos?.results?.length ? (
+        {data.videos?.results?.length > 0 && (
           <div className="mt-8">
             <h2 className="text-2xl font-bold mb-4 text-primary">Videos</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {data.videos.results
-                ?.filter((video) => video.site === "YouTube")
-                .slice(0, 6)
-                .map((video) => (
+                .filter((video: any) => video.site === "YouTube")
+                .slice(0, 6) // Limit to 6 videos
+                .map((video: any) => (
                   <div key={video.id} className="relative aspect-video">
                     <iframe
                       src={`https://www.youtube.com/embed/${video.key}`}
@@ -180,11 +143,11 @@ export default async function DetailsPage({ params }: PageProps) {
                 ))}
             </div>
           </div>
-        ) : null}
+        )}
       </div>
     );
-  } catch (error) {
-    console.error("Error rendering page:", (error as Error).message);
+  } catch (error: any) {
+    console.error("Error rendering page:", error.message);
     notFound();
   }
 }
